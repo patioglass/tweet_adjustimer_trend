@@ -1,0 +1,7 @@
+{
+    "type": "commonjs",
+    "dependencies": {
+        "mysql2": "^2.3.3",
+        "twitter-api-v2": "^1.12.8"
+    }
+}
