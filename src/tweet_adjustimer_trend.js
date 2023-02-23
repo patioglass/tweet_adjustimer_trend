@@ -40,7 +40,21 @@ cron.schedule('0 0 0 * * *', async () => {
                     )
                 group by video_title;`
         )
-        const targetVideo = selectResult[Math.floor(Math.random() * selectResult.length)];
+        let targetVideo = selectResult[Math.floor(Math.random() * selectResult.length)];
+	if (!targetVideo) {
+	    const retlyVideoSelect = await pool.query(
+            ` select video_title, video_url from videoHistory
+                where
+                    (video_service_type=0 or video_service_type=6)
+                    and video_url not like "%watchparty%"
+                    and not exists(
+                        select * from tweetHistory
+                            where videoHistory.video_title=tweetHistory.video_title
+                    )
+                group by video_title;`
+	    );
+	    targetVideo = retlyVideoSelect[Math.floor(Math.random() * selectResult.length)];
+	}
 
         // tweet
         postTweet(rwClient, targetVideo);
@@ -55,7 +69,7 @@ cron.schedule('0 0 0 * * *', async () => {
 async function postTweet(rwClient, data) {
     const currentDate = new Date();
     const tweetText = `
-        #今日のAdjusTimer\n#${currentDate.getFullYear()}${currentDate.getMonth()+1}${currentDate.getDate()}\n\n最近同時視聴された動画紹介👉\n\n『${data.video_title}』\n${data.video_url}
+        #今日のAdjusTimer\n${currentDate.getFullYear()}\/${currentDate.getMonth()+1}\/${currentDate.getDate()}\n\n最近同時視聴された動画紹介👉\n\n『${data.video_title}』\n${data.video_url}
     `;
     const result = await rwClient.v1.tweet(tweetText, {});
-} 
+}
