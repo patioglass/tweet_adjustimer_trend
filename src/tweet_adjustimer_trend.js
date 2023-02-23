@@ -42,7 +42,7 @@ cron.schedule('0 0 0 * * *', async () => {
         )
         let targetVideo = selectResult[Math.floor(Math.random() * selectResult.length)];
 	if (!targetVideo) {
-	    const retlyVideoSelect = await pool.query(
+	    const retryVideoSelect = await pool.query(
             ` select video_title, video_url from videoHistory
                 where
                     (video_service_type=0 or video_service_type=6)
@@ -53,7 +53,7 @@ cron.schedule('0 0 0 * * *', async () => {
                     )
                 group by video_title;`
 	    );
-	    targetVideo = retlyVideoSelect[Math.floor(Math.random() * selectResult.length)];
+	    targetVideo = retryVideoSelect[Math.floor(Math.random() * selectResult.length)];
 	}
 
         // tweet
